@@ -27,7 +27,7 @@ class SimulatedAnnealing<T> {
      */
     public SimulatedAnnealing(AnnealingSystem<T> system, CoolingSchedule coolingSchedule, int iters) {
         if (iters <= 0) {
-            throw new IllegalArgumentException("Number of iterations per step must be stricly positive (got $iters)");
+            throw new IllegalArgumentException("Number of iterations per step must be stricly positive");
         }
         this.system = system;
         this.coolingSchedule = coolingSchedule;
@@ -41,9 +41,9 @@ class SimulatedAnnealing<T> {
      */
     public AnnealingResult<T> optimize() {
         // Initial solution is provided by the system (with its associated cost).
-        AnnealingResult<T> result = initialSolution();
+        AnnealingResult<T> result = getInitialSolution();
         if (result.getCost() == 0) {
-            // If the cost of the initial solution is null, we can terminate now.
+            // If the getCost of the initial solution is null, we can terminate now.
             logger.info(String.format("Accepted solution %s (cost=0, initial)", result.getValue().toString()));
             return result;
         }
@@ -60,7 +60,7 @@ class SimulatedAnnealing<T> {
         while (temp > coolingSchedule.getMinimum()) {
             // For each temperature, the simulation will be ran several times.
             for (int i = 0; i < iters; i++) {
-                final AnnealingResult<T> newResult = neighbor(result.getValue());
+                final AnnealingResult<T> newResult = getNeighbor(result.getValue());
                 if (newResult.getCost() == 0) {
                     // If the cost of the new solution is null, we can terminate now.
                     logger.info(String.format(
@@ -69,7 +69,7 @@ class SimulatedAnnealing<T> {
                     return newResult;
                 }
                 // We compute an acceptance probability for the new solution.
-                final double ap = system.acceptanceProbability(result.getCost(), newResult.getCost(), temp);
+                final double ap = system.getAcceptanceProbability(result.getCost(), newResult.getCost(), temp);
                 if (ap < 0 || ap > 1) {
                     throw new IllegalArgumentException(String.format(
                             "Acceptance probability must be in [0,1] (got %s for oldCost=%s, newCost=%s, T=%s)",
@@ -108,18 +108,18 @@ class SimulatedAnnealing<T> {
     /**
      * Compute the initial solution and its associated cost.
      */
-    private AnnealingResult<T> initialSolution() {
-        final T solution = system.initialSolution();
-        final double cost = system.cost(solution);
+    private AnnealingResult<T> getInitialSolution() {
+        final T solution = system.getInitialSolution();
+        final double cost = system.getCost(solution);
         return new AnnealingResult<>(solution, cost);
     }
 
     /**
      * Compute a neighbor solution and its associated cost.
      */
-    private AnnealingResult<T> neighbor(T solution) {
-        final T newSolution = system.neighbor(solution);
-        final double cost = system.cost(newSolution);
+    private AnnealingResult<T> getNeighbor(T solution) {
+        final T newSolution = system.getNeighbor(solution);
+        final double cost = system.getCost(newSolution);
         return new AnnealingResult<>(newSolution, cost);
     }
 }

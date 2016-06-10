@@ -9,21 +9,21 @@ public interface AnnealingSystem<T> {
     /**
      * Generate an initial solution. It should include some randomness.
      */
-    T initialSolution();
+    T getInitialSolution();
 
     /**
-     * Return the cost of a given solution. It should be deterministic.
+     * Return the getCost of a given solution. It should be deterministic.
      *
      * @param solution A solution to evaluate
      */
-    double cost(T solution);
+    double getCost(T solution);
 
     /**
      * Generate a neighboring solution from a given solution. It should include some randomness.
      *
      * @param solution A solution
      */
-    T neighbor(T solution);
+    T getNeighbor(T solution);
 
     /**
      * Return the acceptance probability.
@@ -33,7 +33,7 @@ public interface AnnealingSystem<T> {
      * @param temp    Current temperature
      * @return A probability for the new solution to be accepted (hence in [0,1])
      */
-    default double acceptanceProbability(double oldCost, double newCost, double temp) {
+    default double getAcceptanceProbability(double oldCost, double newCost, double temp) {
         if (oldCost == 0) {
             return 0;
         } else if (newCost < oldCost) {
